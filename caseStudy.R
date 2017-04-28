@@ -43,6 +43,8 @@ master_frame[,"raised_amount_usd"][is.na(master_frame[, "raised_amount_usd"])] <
 #Calculate the average investment amount for each of the four funding types (venture, angel, seed, and private equity) 
 avg_invst_fundTypesOf4 <- filter(aggregate(master_frame$raised_amount_usd, by=list(master_frame$funding_round_type), FUN= mean),Group.1 %in% list("venture", "angel", "seed", "private_equity"))
 
+### save as textfile for Checkpoint 7: Plots
+write.csv(avg_invst_fundTypesOf4,"avg_invst_fundTypesOf4.txt")
 #Results Expected: Table 3.1
 # Average funding amount of venture type	
 avg_invst_fundTypesOf4[which(avg_invst_fundTypesOf4$Group.1=="venture"),]$x
@@ -59,7 +61,8 @@ suitable_frame <- master_frame[which(master_frame$funding_round_type==suitable_f
 #Checkpoints - Part 2
 #Checkpoint 4: Country Analysis
 #top 9 countries that has highest total funding in choosen fundng type
-top9<- arrange(aggregate(suitable_frame$raised_amount_usd, by=list(suitable_frame$country_code), FUN = sum), desc(x))
+top9<- arrange(aggregate(suitable_frame$raised_amount_usd, by=list(suitable_frame$country_code), FUN = sum), desc(x))[1:9,]
+write.csv(top9, "top9Contires.csv")
 
 #library(countrycode) can used to convert list of Full Name countries to ISO3C format.
 #Example: suitable_frame$country_code <- countrycode(suitable_frame$country_code,'iso3c','country.name')
@@ -133,11 +136,10 @@ D3_merge_count_amount <- merge(D3_total_count,D3_total_amount,by="main_sector")
 
 D3<-merge(D3,D3_merge_count_amount,by="main_sector")
 
-#crate temp data sets
+# Create data for a plot showing the number of investments in the top 3 sectors of the top 3 countries on one chart (for the chosen investment type FT).
 
-D1_temp<- select(D1,main_sector,funding_round_type,raised_amount_usd,name,country_code)
-D2_temp<- select(D2,main_sector,funding_round_type,raised_amount_usd,name,country_code)
-D3_temp<- select(D3,main_sector,funding_round_type,raised_amount_usd,name,country_code)
+write.csv(rbind(D1,D2,D3) , "top3_Sector_conunty.csv")
+
 
 #Table 6.1 : Sector-wise Investment Analysis
 # Total number of investments 
