@@ -41,19 +41,25 @@ master_frame[,"raised_amount_usd"][is.na(master_frame[, "raised_amount_usd"])] <
 
 #Checkpoint 3: Funding Type Analysis
 #Calculate the average investment amount for each of the four funding types (venture, angel, seed, and private equity) 
-avg_invst_fundTypesOf4 <- filter(aggregate(master_frame$raised_amount_usd, by=list(master_frame$funding_round_type), FUN= mean),Group.1 %in% list("venture", "angel", "seed", "private_equity"))
+avg_invst_fundTypesAll <- aggregate(master_frame$raised_amount_usd, by=list(master_frame$funding_round_type), FUN= mean)
+colnames(avg_invst_fundTypesAll)[1] <- "funding_types"
+colnames(avg_invst_fundTypesAll)[2] <- "avg_invst_amt"
+
+avg_invst_fundTypesOf4 <- filter(avg_invst_fundTypesAll,funding_types %in% list("venture", "angel", "seed", "private_equity"))
+
+
 
 ### save as textfile for Checkpoint 7: Plots
 write.csv(avg_invst_fundTypesOf4,"avg_invst_fundTypesOf4.txt")
 #Results Expected: Table 3.1
 # Average funding amount of venture type	
-avg_invst_fundTypesOf4[which(avg_invst_fundTypesOf4$Group.1=="venture"),]$x
-avg_invst_fundTypesOf4[which(avg_invst_fundTypesOf4$Group.1=="angel"),]$x
-avg_invst_fundTypesOf4[which(avg_invst_fundTypesOf4$Group.1=="seed"),]$x
-avg_invst_fundTypesOf4[which(avg_invst_fundTypesOf4$Group.1=="private_equity"),]$x
+avg_invst_fundTypesOf4[which(avg_invst_fundTypesOf4$funding_types=="venture"),]$avg_invst_amt
+avg_invst_fundTypesOf4[which(avg_invst_fundTypesOf4$funding_types=="angel"),]$avg_invst_amt
+avg_invst_fundTypesOf4[which(avg_invst_fundTypesOf4$funding_types=="seed"),]$avg_invst_amt
+avg_invst_fundTypesOf4[which(avg_invst_fundTypesOf4$funding_types=="private_equity"),]$avg_invst_amt
 
 #find suitable fund between 5 to 15 million USD per investment round
-suitable_fund <- filter (avg_invst_fundTypesOf4, x >= 5000000 & x <= 15000000)$Group.1
+suitable_fund <- filter (avg_invst_fundTypesOf4, avg_invst_amt >= 5000000 & avg_invst_amt <= 15000000)$funding_types
 
 #find the data frame that only suitable fund  for further conuntry analysis
 suitable_frame <- master_frame[which(master_frame$funding_round_type==suitable_fund),]
@@ -62,6 +68,7 @@ suitable_frame <- master_frame[which(master_frame$funding_round_type==suitable_f
 #Checkpoint 4: Country Analysis
 #top 9 countries that has highest total funding in choosen fundng type
 top9<- arrange(aggregate(suitable_frame$raised_amount_usd, by=list(suitable_frame$country_code), FUN = sum), desc(x))[1:9,]
+colnames(top9)[1] <- "country_code"
 write.csv(top9, "top9Contires.csv")
 
 #library(countrycode) can used to convert list of Full Name countries to ISO3C format.
@@ -71,7 +78,7 @@ write.csv(top9, "top9Contires.csv")
 eng_speaking_cntry_list <- list("IND","GBR","USA","CAN")
 
 #top3 contries list
-best_eng_countries <- head(intersect(top9$Group.1,eng_speaking_cntry_list),3) 
+best_eng_countries <- head(intersect(top9$country_code,eng_speaking_cntry_list),3) 
 #Table 4.1: Analysing the Top 3 English-Speaking Countries
 best_eng_countries[1]  # 1. Top English-speaking country	
 best_eng_countries[2]  # 2. Second English-speaking country	
