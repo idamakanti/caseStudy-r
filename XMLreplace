@@ -1,0 +1,16 @@
+
+bills<-read.csv("bills.csv",stringsAsFactors = FALSE)
+
+
+tx  <- readLines("text.xml")
+
+for ( i in 1:nrow(bills) ){
+  
+bill<- as.character(bills[i,])
+
+temp<-paste("<from>",bill,sep="")
+tx2  <- gsub(pattern = "<from>", replace =temp , x = tx)
+filename <- paste("files/",bill,".xml",sep="")
+writeLines(tx2, con=filename)
+
+}
